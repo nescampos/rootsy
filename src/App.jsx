@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import { getDefaultConfig, RainbowKitProvider, ConnectButton } from '@rainbow-me/rainbowkit';
 import { WagmiProvider } from 'wagmi';
@@ -8,6 +8,7 @@ import Index from './pages/Index';
 import Projects from './pages/Projects';
 import CreateProject from './pages/CreateProject';
 import UpdateProject from './pages/UpdateProject';
+import { supabase } from './supabaseClient';
 import './styles.css';
 
 const projectId = import.meta.env.VITE_WALLETCONNECT_PROJECT_ID || 'rootsy-zora-funding';
@@ -23,8 +24,19 @@ const queryClient = new QueryClient();
 function App() {
   const [projects, setProjects] = useState([]);
 
-  const addProject = (project) => {
-    setProjects((prev) => [...prev, project]);
+  // Fetch projects from Supabase
+  const fetchProjects = async () => {
+    const { data, error } = await supabase.from('projects').select('*').order('created_at', { ascending: false });
+    if (!error) setProjects(data || []);
+  };
+
+  useEffect(() => {
+    fetchProjects();
+  }, []);
+
+  // Refetch projects after a new one is added
+  const handleProjectAdded = () => {
+    fetchProjects();
   };
 
   return (
@@ -45,7 +57,7 @@ function App() {
                 <Routes>
                   <Route path="/" element={<Index />} />
                   <Route path="/projects" element={<Projects projects={projects} />} />
-                  <Route path="/create" element={<CreateProject addProject={addProject} />} />
+                  <Route path="/create" element={<CreateProject addProject={handleProjectAdded} />} />
                   <Route path="/update" element={<UpdateProject />} />
                 </Routes>
               </div>

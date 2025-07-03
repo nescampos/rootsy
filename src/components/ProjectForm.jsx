@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useAccount, useChainId } from 'wagmi';
 import { createCoin } from '../zora/coinCreate';
 import * as w3up from '@web3-storage/w3up-client';
+import { supabase } from '../supabaseClient';
 
 function ProjectForm({ addProject }) {
   const [name, setName] = useState('');
@@ -48,6 +49,21 @@ function ProjectForm({ addProject }) {
       repo,
       signer: null // TODO: pass real signer
     });
+    const { error } = await supabase.from('projects').insert([
+      {
+        name,
+        symbol,
+        description,
+        repo,
+        image_uri: imageUri,
+        payout_recipient: address,
+        chain_id: chainId,
+      }
+    ]);
+    if (error) {
+      alert('Error saving project to Supabase: ' + error.message);
+      return;
+    }
     addProject({ name, symbol, description, repo, imageUri, payoutRecipient: address, chainId });
     setName('');
     setSymbol('');
