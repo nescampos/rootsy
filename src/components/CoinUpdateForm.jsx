@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
+import { useAccount } from 'wagmi';
 import { updateCoin } from '../zora/coinUpdate';
 
 function CoinUpdateForm() {
   const [tokenAddress, setTokenAddress] = useState('');
   const [newName, setNewName] = useState('');
   const [newSymbol, setNewSymbol] = useState('');
+  const { isConnected } = useAccount();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -18,6 +20,7 @@ function CoinUpdateForm() {
   return (
     <form onSubmit={handleSubmit} style={{ margin: '24px 0' }}>
       <h2>Update Coin</h2>
+      {!isConnected && <div style={{ color: '#b91c1c', marginBottom: 12 }}>Connect your wallet to update a coin.</div>}
       <input
         type="text"
         placeholder="Token Address"
@@ -42,7 +45,7 @@ function CoinUpdateForm() {
         required
         style={{ width: '100%', marginBottom: 8 }}
       />
-      <button type="submit">Update</button>
+      <button type="submit" disabled={!isConnected}>Update</button>
     </form>
   );
 }

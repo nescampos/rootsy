@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useAccount } from 'wagmi';
 import { createCoin } from '../zora/coinCreate';
 
 function ProjectForm({ addProject }) {
@@ -6,6 +7,7 @@ function ProjectForm({ addProject }) {
   const [description, setDescription] = useState('');
   const [repo, setRepo] = useState('');
   const [wallet, setWallet] = useState('');
+  const { isConnected } = useAccount();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -26,6 +28,7 @@ function ProjectForm({ addProject }) {
   return (
     <form onSubmit={handleSubmit} style={{ margin: '24px 0' }}>
       <h2>Submit Your Project</h2>
+      {!isConnected && <div style={{ color: '#b91c1c', marginBottom: 12 }}>Connect your wallet to create a project.</div>}
       <input
         type="text"
         placeholder="Project Name"
@@ -57,7 +60,7 @@ function ProjectForm({ addProject }) {
         required
         style={{ width: '100%', marginBottom: 8 }}
       />
-      <button type="submit">Add Project</button>
+      <button type="submit" disabled={!isConnected}>Add Project</button>
     </form>
   );
 }
