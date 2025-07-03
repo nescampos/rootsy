@@ -11,7 +11,7 @@ setApiKey(import.meta.env.VITE_ZORA_API);
 const chainMap = {
   [base.id]: base,
   [baseSepolia.id]: baseSepolia,
-  [mainnet.id]: mainnet
+  [mainnet.id]: mainnet,
 };
 
 /**
@@ -24,17 +24,20 @@ const chainMap = {
  * @param {string} params.description - Coin/project description
  * @param {File} params.image - Image file for metadata
  * @param {string} params.repo - Project repository link
+ * @param {string} [params.currency] - 'ZORA' or 'ETH'
  * @param {object} params.signer - Wallet client (viem)
  * @returns {Promise<Object>} Coin creation result
  */
-export async function createCoin({ name, symbol, payoutRecipient, chainId, description = '', image, repo = '', signer }) {
+export async function createCoin({ name, symbol, payoutRecipient, chainId, description = '', image, repo = '', currency = 'ZORA', signer }) {
   try {
     // 1. Build and upload metadata
     const metadataBuilder = createMetadataBuilder()
       .withName(name)
       .withSymbol(symbol)
       .withDescription(description)
-      .withExternalUrl(repo);
+      .withProperties({
+        "repo": repo
+      })
     if (image) {
       metadataBuilder.withImage(image);
     }
@@ -55,7 +58,7 @@ export async function createCoin({ name, symbol, payoutRecipient, chainId, descr
       ...createMetadataParameters,
       payoutRecipient,
       chainId,
-      currency: DeployCurrency.ZORA, // or DeployCurrency.ETH
+      currency: currency === 'ETH' ? DeployCurrency.ETH : DeployCurrency.ZORA,
     };
 
     // 4. Call Zora SDK to create the coin

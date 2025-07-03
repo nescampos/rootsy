@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
-import { useAccount, useChainId } from 'wagmi';
+import { useAccount, useChainId, useWalletClient } from 'wagmi';
 import { createCoin } from '../zora/coinCreate';
 import * as w3up from '@web3-storage/w3up-client';
 import { supabase } from '../supabaseClient';
+
+const BASE_SEPOLIA_CHAIN_ID = 84532;
 
 function ProjectForm({ addProject }) {
   const [name, setName] = useState('');
@@ -12,8 +14,10 @@ function ProjectForm({ addProject }) {
   const [image, setImage] = useState(null);
   const [imageUri, setImageUri] = useState('');
   const [uploading, setUploading] = useState(false);
+  const [currency, setCurrency] = useState('ZORA');
   const { address, isConnected } = useAccount();
   const chainId = useChainId();
+  const { data: walletClient } = useWalletClient();
 
   const handleImageChange = async (e) => {
     const file = e.target.files[0];
@@ -22,8 +26,8 @@ function ProjectForm({ addProject }) {
     try {
       // Set up w3up client and space
       const client = await w3up.create();
-      const space = await client.login(import.meta.env.VITE_W3UP_SPACE);
-      await client.setCurrentSpace(space.did());
+      await client.login(import.meta.env.VITE_W3UP_EMAIL);
+      await client.setCurrentSpace(import.meta.env.VITE_W3UP_SPACE);
       // Upload file
       const cid = await client.uploadFile(file);
       const uri = `ipfs://${cid}`;
@@ -31,6 +35,7 @@ function ProjectForm({ addProject }) {
       setImage(file);
     } catch (err) {
       alert('Image upload failed');
+      alert(err);
     } finally {
       setUploading(false);
     }
@@ -38,7 +43,7 @@ function ProjectForm({ addProject }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!name || !symbol || !description || !repo || !imageUri || !address || !chainId) return;
+    if (!name || !symbol || !description || !repo || !imageUri || !address || !chainId || !walletClient) return;
     let coinResult;
     try {
       coinResult = await createCoin({
@@ -49,7 +54,8 @@ function ProjectForm({ addProject }) {
         description,
         image,
         repo,
-        signer: null // TODO: pass real signer
+        currency: chainId === BASE_SEPOLIA_CHAIN_ID ? 'ETH' : currency,
+        signer: walletClient
       });
     } catch (err) {
       alert('Error creating coin: ' + (err?.message || err));
@@ -70,20 +76,24 @@ function ProjectForm({ addProject }) {
         payout_recipient: address,
         chain_id: chainId,
         coin_address: coinAddress,
+        currency: chainId === BASE_SEPOLIA_CHAIN_ID ? 'ETH' : currency,
       }
     ]);
     if (error) {
       alert('Error saving project to Supabase: ' + error.message);
       return;
     }
-    addProject({ name, symbol, description, repo, imageUri, payoutRecipient: address, chainId, coinAddress });
+    addProject({ name, symbol, description, repo, imageUri, payoutRecipient: address, chainId, coinAddress, currency: chainId === BASE_SEPOLIA_CHAIN_ID ? 'ETH' : currency });
     setName('');
     setSymbol('');
     setDescription('');
     setRepo('');
     setImage(null);
     setImageUri('');
+    setCurrency('ZORA');
   };
+
+  const isBaseSepolia = chainId === BASE_SEPOLIA_CHAIN_ID;
 
   return (
     <form onSubmit={handleSubmit} style={{ margin: '24px 0' }}>
@@ -127,9 +137,22 @@ function ProjectForm({ addProject }) {
         required
         style={{ width: '100%', marginBottom: 8 }}
       />
+      <div style={{ marginBottom: 12 }}>
+        <label>Currency:</label>
+        <select
+          value={isBaseSepolia ? 'ETH' : currency}
+          onChange={e => setCurrency(e.target.value)}
+          disabled={isBaseSepolia}
+          style={{ width: '100%', marginBottom: 8 }}
+        >
+          <option value="ZORA">ZORA</option>
+          <option value="ETH">ETH</option>
+        </select>
+        {isBaseSepolia && <div style={{ color: '#6366f1', fontSize: 13 }}>Only ETH is supported on Base Sepolia.</div>}
+      </div>
       {uploading && <div style={{ color: '#6366f1', marginBottom: 8 }}>Uploading image to IPFS...</div>}
       {imageUri && <div style={{ color: '#059669', marginBottom: 8 }}>Image uploaded: {imageUri}</div>}
-      <button type="submit" disabled={!isConnected || uploading || !imageUri}>Add Project</button>
+      <button type="submit" disabled={!isConnected || uploading || !imageUri || !walletClient}>Add Project</button>
     </form>
   );
 }
