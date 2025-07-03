@@ -11,7 +11,6 @@ function Index() {
       <ul>
         <li><Link to="/projects">View Projects</Link></li>
         <li><Link to="/create">Create a Project</Link></li>
-        <li><Link to="/update">Update Project/Currency</Link></li>
       </ul>
     </div>
   );

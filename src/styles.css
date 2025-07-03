@@ -1,79 +1,157 @@
 body {
-  background: linear-gradient(135deg, #e0e7ff 0%, #f3e8ff 100%);
-  font-family: 'Inter', Arial, sans-serif;
+  background: linear-gradient(135deg, #f8fafc 0%, #e0e7ff 100%);
+  font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
   margin: 0;
   min-height: 100vh;
+  color: #22223b;
 }
 
 .app-header {
-  background: #6366f1;
+  background: linear-gradient(90deg, #6366f1 0%, #7c3aed 100%);
   color: white;
-  padding: 24px 0 12px 0;
+  padding: 32px 0 16px 0;
   text-align: center;
-  font-size: 2rem;
+  font-size: 2.5rem;
   letter-spacing: 2px;
   margin-bottom: 24px;
-  box-shadow: 0 2px 8px rgba(99,102,241,0.08);
+  box-shadow: 0 2px 16px rgba(99,102,241,0.10);
+  border-bottom-left-radius: 32px;
+  border-bottom-right-radius: 32px;
 }
 
 .navbar {
   display: flex;
   justify-content: center;
-  gap: 32px;
-  background: #a5b4fc;
-  padding: 12px 0;
+  gap: 40px;
+  background: #f1f5f9;
+  padding: 16px 0;
   margin-bottom: 32px;
-  border-radius: 0 0 16px 16px;
+  border-radius: 0 0 24px 24px;
+  box-shadow: 0 2px 8px rgba(99,102,241,0.06);
 }
 
 .navbar a {
   color: #3730a3;
   text-decoration: none;
   font-weight: 600;
-  font-size: 1.1rem;
-  transition: color 0.2s;
+  font-size: 1.15rem;
+  transition: color 0.2s, border-bottom 0.2s;
+  padding-bottom: 2px;
+  border-bottom: 2px solid transparent;
 }
 
 .navbar a:hover {
   color: #7c3aed;
+  border-bottom: 2px solid #7c3aed;
 }
 
 .card {
   background: white;
-  border-radius: 16px;
-  box-shadow: 0 2px 16px rgba(99,102,241,0.08);
-  padding: 24px;
-  margin-bottom: 24px;
+  border-radius: 20px;
+  box-shadow: 0 4px 24px rgba(99,102,241,0.10);
+  padding: 28px 24px;
+  margin-bottom: 32px;
+  transition: box-shadow 0.2s;
+}
+
+.card:hover {
+  box-shadow: 0 8px 32px rgba(99,102,241,0.16);
 }
 
 form input, form textarea {
-  border: 1px solid #a5b4fc;
-  border-radius: 8px;
-  padding: 10px;
-  margin-bottom: 12px;
+  border: 1.5px solid #a5b4fc;
+  border-radius: 10px;
+  padding: 12px;
+  margin-bottom: 16px;
   width: 100%;
-  font-size: 1rem;
+  font-size: 1.08rem;
   background: #f8fafc;
   transition: border 0.2s;
+  box-sizing: border-box;
 }
 
 form input:focus, form textarea:focus {
-  border: 1.5px solid #6366f1;
+  border: 2px solid #6366f1;
   outline: none;
 }
 
 button {
-  background: linear-gradient(90deg, #6366f1 0%, #a5b4fc 100%);
+  background: linear-gradient(90deg, #6366f1 0%, #7c3aed 100%);
   color: white;
   border: none;
-  border-radius: 8px;
-  padding: 10px 24px;
-  font-size: 1rem;
-  font-weight: 600;
+  border-radius: 10px;
+  padding: 12px 32px;
+  font-size: 1.08rem;
+  font-weight: 700;
   cursor: pointer;
-  transition: background 0.2s;
+  transition: background 0.2s, box-shadow 0.2s;
+  box-shadow: 0 2px 8px rgba(99,102,241,0.10);
 }
 
-button:hover {
-  background: linear-gradient(90deg, #7c3aed 0%, #818cf8 100%);
+button:disabled {
+  background: #c7d2fe;
+  color: #a5b4fc;
+  cursor: not-allowed;
+}
+
+button:hover:not(:disabled) {
+  background: linear-gradient(90deg, #7c3aed 0%, #6366f1 100%);
+  box-shadow: 0 4px 16px rgba(99,102,241,0.16);
+}
+
+img {
+  max-width: 100%;
+  border-radius: 12px;
+  margin-bottom: 16px;
+  display: block;
+}
+
+@media (max-width: 800px) {
+  .app-header {
+    font-size: 2rem;
+    padding: 24px 0 10px 0;
+    border-bottom-left-radius: 20px;
+    border-bottom-right-radius: 20px;
+  }
+  .navbar {
+    gap: 20px;
+    padding: 10px 0;
+    margin-bottom: 20px;
+    border-radius: 0 0 14px 14px;
+  }
+  .card {
+    padding: 18px 10px;
+    margin-bottom: 18px;
+    border-radius: 12px;
+  }
+}
+
+@media (max-width: 500px) {
+  .app-header {
+    font-size: 1.3rem;
+    padding: 14px 0 6px 0;
+    border-bottom-left-radius: 10px;
+    border-bottom-right-radius: 10px;
+  }
+  .navbar {
+    gap: 10px;
+    font-size: 0.95rem;
+    padding: 6px 0;
+    margin-bottom: 10px;
+    border-radius: 0 0 8px 8px;
+  }
+  .card {
+    padding: 10px 4px;
+    margin-bottom: 10px;
+    border-radius: 8px;
+  }
+  form input, form textarea {
+    font-size: 0.98rem;
+    padding: 8px;
+    margin-bottom: 10px;
+  }
+  button {
+    font-size: 0.98rem;
+    padding: 8px 16px;
+  }
 } 
