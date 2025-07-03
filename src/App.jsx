@@ -9,6 +9,7 @@ import Projects from './pages/Projects';
 import CreateProject from './pages/CreateProject';
 import Profile from './pages/Profile';
 import TradeCoinForm from './components/TradeCoinForm';
+import ProjectDetail from './pages/ProjectDetail';
 import { supabase } from './supabaseClient';
 import './styles.css';
 
@@ -62,6 +63,7 @@ function App() {
                   <Route path="/create" element={<CreateProject addProject={handleProjectAdded} />} />
                   <Route path="/trade" element={<TradeCoinForm />} />
                   <Route path="/profile" element={<Profile />} />
+                  <Route path="/project/:coinAddress" element={<ProjectDetail />} />
                 </Routes>
               </div>
             </div>
