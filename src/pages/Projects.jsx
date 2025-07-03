@@ -24,9 +24,6 @@ function Projects({ projects }) {
           {projects.map((project, idx) => (
             <Link key={project.id || idx} to={`/project/${project.coin_address}`} style={{ textDecoration: 'none' }}>
               <div className="card" style={{ cursor: 'pointer', transition: 'box-shadow 0.2s, transform 0.2s', minHeight: 220 }}>
-                {project.image_uri && (
-                  <img src={project.image_uri.replace('ipfs://', 'https://ipfs.io/ipfs/')} alt={project.name} style={{ width: '100%', borderRadius: 8, marginBottom: 12, maxHeight: 140, objectFit: 'cover' }} />
-                )}
                 <h3 style={{ fontWeight: 700, fontSize: '1.25rem', marginBottom: 6 }}>{project.name} <span style={{ color: '#6366f1', fontWeight: 400 }}>({project.symbol})</span></h3>
                 <p style={{ color: '#666', marginBottom: 8 }}>{project.description}</p>
                 <a href={project.repo} target="_blank" rel="noopener noreferrer" style={{ color: '#7c3aed', fontWeight: 600 }}>Repo</a>

@@ -7,8 +7,7 @@ setApiKey(import.meta.env.VITE_ZORA_API);
 
 const CHAIN_NAMES = {
   8453: 'Base',
-  84532: 'Base Sepolia',
-  7777777: 'Zora',
+  84532: 'Base Sepolia'
 };
 
 function isAddress(str) {

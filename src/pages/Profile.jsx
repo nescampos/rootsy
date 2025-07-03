@@ -14,6 +14,7 @@ function Profile() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [projectCoinAddresses, setProjectCoinAddresses] = useState([]);
+  const [userProjects, setUserProjects] = useState([]);
 
   // Fetch all project coin addresses from Supabase
   const fetchProjectCoinAddresses = async () => {
@@ -21,6 +22,14 @@ function Profile() {
     if (!error && data) {
       setProjectCoinAddresses(data.map(p => p.coin_address?.toLowerCase()).filter(Boolean));
     }
+  };
+
+  // Fetch projects created by the user
+  const fetchUserProjects = async (userAddress) => {
+    if (!userAddress) return;
+    const { data, error } = await supabase.from('projects').select('*').eq('payout_recipient', userAddress.toLowerCase());
+    if (!error && data) setUserProjects(data);
+    else setUserProjects([]);
   };
 
   const fetchProfile = async (id) => {
@@ -58,13 +67,17 @@ function Profile() {
     if (isConnected && address && projectCoinAddresses.length > 0) {
       setIdentifier(address);
       fetchProfile(address);
+      fetchUserProjects(address);
     }
     // eslint-disable-next-line
   }, [isConnected, address, projectCoinAddresses.length]);
 
   const handleSearch = (e) => {
     e.preventDefault();
-    if (identifier) fetchProfile(identifier);
+    if (identifier) {
+      fetchProfile(identifier);
+      fetchUserProjects(identifier);
+    }
   };
 
   return (
@@ -113,6 +126,31 @@ function Profile() {
       {balances.length === 0 && !loading && (
         <div className="card" style={{ textAlign: 'center', color: '#666', animation: 'fadeInUp 0.7s cubic-bezier(.4,0,.2,1)' }}>
           No balances for coins created in this platform's projects.
+        </div>
+      )}
+
+      {/* User's created projects */}
+      <h3 style={{ margin: '40px 0 18px 0', fontWeight: 800, color: '#6366f1' }}>Your Created Projects</h3>
+      {userProjects.length === 0 ? (
+        <div className="card" style={{ textAlign: 'center', color: '#666' }}>No projects created yet.</div>
+      ) : (
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: userProjects.length > 1 ? '1fr 1fr' : '1fr',
+          gap: 24,
+          marginBottom: 32
+        }}>
+          {userProjects.map((project, idx) => (
+            <a key={project.id || idx} href={`/project/${project.coin_address}`} style={{ textDecoration: 'none' }}>
+              <div className="card" style={{ cursor: 'pointer', transition: 'box-shadow 0.2s, transform 0.2s', minHeight: 220 }}>
+                <h3 style={{ fontWeight: 700, fontSize: '1.15rem', marginBottom: 6 }}>{project.name} <span style={{ color: '#6366f1', fontWeight: 400 }}>({project.symbol})</span></h3>
+                <p style={{ color: '#666', marginBottom: 8 }}>{project.description}</p>
+                <a href={project.repo} target="_blank" rel="noopener noreferrer" style={{ color: '#7c3aed', fontWeight: 600 }}>Repo</a>
+                <p style={{ fontSize: 13, color: '#666', margin: '8px 0 0 0' }}>Payout: {project.payout_recipient}</p>
+                <p style={{ fontSize: 13, color: '#666' }}>Chain: {project.chain_id}</p>
+              </div>
+            </a>
+          ))}
         </div>
       )}
     </>
