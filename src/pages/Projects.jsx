@@ -2,6 +2,12 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import ProjectList from '../components/ProjectList';
 
+const CHAIN_NAMES = {
+  8453: 'Base',
+  84532: 'Base Sepolia',
+  7777777: 'Zora',
+};
+
 function Projects({ projects }) {
   return (
     <div style={{ maxWidth: 600, margin: '0 auto', padding: 24 }}>
@@ -19,7 +25,7 @@ function Projects({ projects }) {
               <p>{project.description}</p>
               <a href={project.repo} target="_blank" rel="noopener noreferrer">Repo</a>
               <p style={{ fontSize: 13, color: '#666' }}>Payout: {project.payout_recipient}</p>
-              <p style={{ fontSize: 13, color: '#666' }}>Chain ID: {project.chain_id}</p>
+              <p style={{ fontSize: 13, color: '#666' }}>Chain: {CHAIN_NAMES[project.chain_id] || project.chain_id}</p>
             </div>
           </Link>
         ))

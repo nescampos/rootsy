@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import { getDefaultConfig, RainbowKitProvider, ConnectButton } from '@rainbow-me/rainbowkit';
 import { WagmiProvider } from 'wagmi';
-import { mainnet, goerli, zora, base, baseSepolia } from 'wagmi/chains';
+import { base, baseSepolia } from 'wagmi/chains';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import Index from './pages/Index';
 import Projects from './pages/Projects';
@@ -18,7 +18,7 @@ const projectId = import.meta.env.VITE_WALLETCONNECT_PROJECT_ID || 'rootsy-zora-
 const config = getDefaultConfig({
   appName: 'Rootsy',
   projectId,
-  chains: [base, baseSepolia, mainnet],
+  chains: [base, baseSepolia],
   ssr: false,
 });
 const queryClient = new QueryClient();
