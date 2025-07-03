@@ -8,6 +8,7 @@ import Index from './pages/Index';
 import Projects from './pages/Projects';
 import CreateProject from './pages/CreateProject';
 import Profile from './pages/Profile';
+import TradeCoinForm from './components/TradeCoinForm';
 import { supabase } from './supabaseClient';
 import './styles.css';
 
@@ -50,6 +51,7 @@ function App() {
                 <Link to="/">Home</Link>
                 <Link to="/projects">Projects</Link>
                 <Link to="/create">Create</Link>
+                <Link to="/trade">Trade</Link>
                 <Link to="/profile">Profile</Link>
               </nav>
               <div style={{ maxWidth: 600, margin: '0 auto', padding: 24 }}>
@@ -58,6 +60,7 @@ function App() {
                   <Route path="/" element={<Index />} />
                   <Route path="/projects" element={<Projects projects={projects} />} />
                   <Route path="/create" element={<CreateProject addProject={handleProjectAdded} />} />
+                  <Route path="/trade" element={<TradeCoinForm />} />
                   <Route path="/profile" element={<Profile />} />
                 </Routes>
               </div>
