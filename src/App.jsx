@@ -7,7 +7,6 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import Index from './pages/Index';
 import Projects from './pages/Projects';
 import CreateProject from './pages/CreateProject';
-import UpdateProject from './pages/UpdateProject';
 import { supabase } from './supabaseClient';
 import './styles.css';
 
@@ -50,7 +49,6 @@ function App() {
                 <Link to="/">Home</Link>
                 <Link to="/projects">Projects</Link>
                 <Link to="/create">Create</Link>
-                <Link to="/update">Update</Link>
               </nav>
               <div style={{ maxWidth: 600, margin: '0 auto', padding: 24 }}>
                 <ConnectButton />
@@ -58,7 +56,6 @@ function App() {
                   <Route path="/" element={<Index />} />
                   <Route path="/projects" element={<Projects projects={projects} />} />
                   <Route path="/create" element={<CreateProject addProject={handleProjectAdded} />} />
-                  <Route path="/update" element={<UpdateProject />} />
                 </Routes>
               </div>
             </div>

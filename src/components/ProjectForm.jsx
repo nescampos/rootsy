@@ -39,16 +39,27 @@ function ProjectForm({ addProject }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!name || !symbol || !description || !repo || !imageUri || !address || !chainId) return;
-    await createCoin({
-      name,
-      symbol,
-      payoutRecipient: address,
-      chainId,
-      description,
-      image,
-      repo,
-      signer: null // TODO: pass real signer
-    });
+    let coinResult;
+    try {
+      coinResult = await createCoin({
+        name,
+        symbol,
+        payoutRecipient: address,
+        chainId,
+        description,
+        image,
+        repo,
+        signer: null // TODO: pass real signer
+      });
+    } catch (err) {
+      alert('Error creating coin: ' + (err?.message || err));
+      return;
+    }
+    const coinAddress = coinResult?.address;
+    if (!coinAddress) {
+      alert('Coin creation failed: No address returned.');
+      return;
+    }
     const { error } = await supabase.from('projects').insert([
       {
         name,
@@ -58,13 +69,14 @@ function ProjectForm({ addProject }) {
         image_uri: imageUri,
         payout_recipient: address,
         chain_id: chainId,
+        coin_address: coinAddress,
       }
     ]);
     if (error) {
       alert('Error saving project to Supabase: ' + error.message);
       return;
     }
-    addProject({ name, symbol, description, repo, imageUri, payoutRecipient: address, chainId });
+    addProject({ name, symbol, description, repo, imageUri, payoutRecipient: address, chainId, coinAddress });
     setName('');
     setSymbol('');
     setDescription('');
