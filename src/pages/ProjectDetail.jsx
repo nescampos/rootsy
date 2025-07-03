@@ -16,8 +16,8 @@ function isAddress(str) {
 
 function getZoraUrl(chainId, address) {
   if (!address) return null;
-  if (chainId === 8453) return `https://zora.co/coin/base:${address}`;
-  if (chainId === 84532) return `https://testnet.zora.co/coin/bsep:${address}`;
+  if (chainId === "8453") return `https://zora.co/coin/base:${address}`;
+  if (chainId === "84532") return `https://testnet.zora.co/coin/bsep:${address}`;
   return null;
 }
 

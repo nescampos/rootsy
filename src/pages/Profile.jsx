@@ -27,7 +27,7 @@ function Profile() {
   // Fetch projects created by the user
   const fetchUserProjects = async (userAddress) => {
     if (!userAddress) return;
-    const { data, error } = await supabase.from('projects').select('*').eq('payout_recipient', userAddress.toLowerCase());
+    const { data, error } = await supabase.from('projects').select('*').ilike('payout_recipient', userAddress);
     if (!error && data) setUserProjects(data);
     else setUserProjects([]);
   };
@@ -44,6 +44,7 @@ function Profile() {
       // Fetch balances
       const balRes = await getProfileBalances({ identifier: id, count: 50 });
       const balProfile = balRes?.data?.profile;
+      console.log(balProfile);
       let balList = balProfile?.coinBalances?.edges?.map(edge => edge.node) || [];
       // Filter balances to only those in projects table
       if (projectCoinAddresses.length > 0) {
