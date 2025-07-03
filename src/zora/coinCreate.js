@@ -1,9 +1,18 @@
 // coinCreate.js
 // Functions to create new coins with Zora SDK
 
-import { createCoin as zoraCreateCoin, createMetadataBuilder, createZoraUploaderForCreator, DeployCurrency } from '@zoralabs/coins-sdk';
-import { createWalletClient, createPublicClient, http } from 'viem';
-import { base } from 'viem/chains';
+import { createCoin as zoraCreateCoin, createMetadataBuilder, createZoraUploaderForCreator, DeployCurrency, setApiKey } from '@zoralabs/coins-sdk';
+import { createPublicClient, http } from 'viem';
+import { base, baseSepolia, mainnet, goerli, zora } from 'wagmi/chains';
+
+// Set Zora SDK API key from env
+setApiKey(import.meta.env.VITE_ZORA_API);
+
+const chainMap = {
+  [base.id]: base,
+  [baseSepolia.id]: baseSepolia,
+  [mainnet.id]: mainnet
+};
 
 /**
  * Create a new Zora coin (ERC-20) with metadata upload.
@@ -11,18 +20,21 @@ import { base } from 'viem/chains';
  * @param {string} params.name - Coin name
  * @param {string} params.symbol - Coin symbol
  * @param {string} params.payoutRecipient - Address to receive creator earnings
+ * @param {number} params.chainId - Chain ID to deploy on
+ * @param {string} params.description - Coin/project description
+ * @param {File} params.image - Image file for metadata
+ * @param {string} params.repo - Project repository link
  * @param {object} params.signer - Wallet client (viem)
- * @param {string} [params.description] - Coin description
- * @param {File} [params.image] - Optional image file for metadata
  * @returns {Promise<Object>} Coin creation result
  */
-export async function createCoin({ name, symbol, payoutRecipient, signer, description = '', image = undefined }) {
+export async function createCoin({ name, symbol, payoutRecipient, chainId, description = '', image, repo = '', signer }) {
   try {
     // 1. Build and upload metadata
     const metadataBuilder = createMetadataBuilder()
       .withName(name)
       .withSymbol(symbol)
-      .withDescription(description || `A coin for ${name}`);
+      .withDescription(description)
+      .withExternalUrl(repo);
     if (image) {
       metadataBuilder.withImage(image);
     }
@@ -30,26 +42,27 @@ export async function createCoin({ name, symbol, payoutRecipient, signer, descri
       createZoraUploaderForCreator(payoutRecipient)
     );
 
-    // 2. Set up viem clients (public client for base chain)
+    // 2. Set up viem public client for the selected chain
+    const chain = chainMap[chainId];
+    if (!chain) throw new Error('Unsupported chain');
     const publicClient = createPublicClient({
-      chain: base,
-      transport: http(), // Uses default RPC, can be customized
+      chain,
+      transport: http(),
     });
 
     // 3. Prepare coin creation parameters
     const coinParams = {
       ...createMetadataParameters,
       payoutRecipient,
-      chainId: base.id,
+      chainId,
       currency: DeployCurrency.ZORA, // or DeployCurrency.ETH
     };
 
     // 4. Call Zora SDK to create the coin
     const result = await zoraCreateCoin(coinParams, signer, publicClient, {
-      gasMultiplier: 120, // Optional: 20% gas buffer
+      gasMultiplier: 120,
     });
 
-    // 5. Return result (includes tx hash, coin address, deployment info)
     return result;
   } catch (error) {
     console.error('Error creating coin:', error);

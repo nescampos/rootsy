@@ -1,28 +1,60 @@
 import React, { useState } from 'react';
-import { useAccount } from 'wagmi';
+import { useAccount, useChainId } from 'wagmi';
 import { createCoin } from '../zora/coinCreate';
+import * as w3up from '@web3-storage/w3up-client';
 
 function ProjectForm({ addProject }) {
   const [name, setName] = useState('');
+  const [symbol, setSymbol] = useState('');
   const [description, setDescription] = useState('');
   const [repo, setRepo] = useState('');
-  const [wallet, setWallet] = useState('');
-  const { isConnected } = useAccount();
+  const [image, setImage] = useState(null);
+  const [imageUri, setImageUri] = useState('');
+  const [uploading, setUploading] = useState(false);
+  const { address, isConnected } = useAccount();
+  const chainId = useChainId();
+
+  const handleImageChange = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    setUploading(true);
+    try {
+      // Set up w3up client and space
+      const client = await w3up.create();
+      const space = await client.login(import.meta.env.VITE_W3UP_SPACE);
+      await client.setCurrentSpace(space.did());
+      // Upload file
+      const cid = await client.uploadFile(file);
+      const uri = `ipfs://${cid}`;
+      setImageUri(uri);
+      setImage(file);
+    } catch (err) {
+      alert('Image upload failed');
+    } finally {
+      setUploading(false);
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!name || !description || !repo || !wallet) return;
-    // Generate a default symbol from the project name
-    const symbol = name.slice(0, 4).toUpperCase();
-    // Create the coin
-    alert(`Creating coin for project: ${name} (${symbol})`);
-    await createCoin({ name, symbol, signer: null }); // TODO: pass real signer
-    // Add the project
-    addProject({ name, description, repo, wallet, symbol });
+    if (!name || !symbol || !description || !repo || !imageUri || !address || !chainId) return;
+    await createCoin({
+      name,
+      symbol,
+      payoutRecipient: address,
+      chainId,
+      description,
+      image,
+      repo,
+      signer: null // TODO: pass real signer
+    });
+    addProject({ name, symbol, description, repo, imageUri, payoutRecipient: address, chainId });
     setName('');
+    setSymbol('');
     setDescription('');
     setRepo('');
-    setWallet('');
+    setImage(null);
+    setImageUri('');
   };
 
   return (
@@ -34,6 +66,14 @@ function ProjectForm({ addProject }) {
         placeholder="Project Name"
         value={name}
         onChange={e => setName(e.target.value)}
+        required
+        style={{ width: '100%', marginBottom: 8 }}
+      />
+      <input
+        type="text"
+        placeholder="Symbol (e.g. ROOT)"
+        value={symbol}
+        onChange={e => setSymbol(e.target.value)}
         required
         style={{ width: '100%', marginBottom: 8 }}
       />
@@ -53,14 +93,15 @@ function ProjectForm({ addProject }) {
         style={{ width: '100%', marginBottom: 8 }}
       />
       <input
-        type="text"
-        placeholder="Wallet Address"
-        value={wallet}
-        onChange={e => setWallet(e.target.value)}
+        type="file"
+        accept="image/*"
+        onChange={handleImageChange}
         required
         style={{ width: '100%', marginBottom: 8 }}
       />
-      <button type="submit" disabled={!isConnected}>Add Project</button>
+      {uploading && <div style={{ color: '#6366f1', marginBottom: 8 }}>Uploading image to IPFS...</div>}
+      {imageUri && <div style={{ color: '#059669', marginBottom: 8 }}>Image uploaded: {imageUri}</div>}
+      <button type="submit" disabled={!isConnected || uploading || !imageUri}>Add Project</button>
     </form>
   );
 }
