@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { createCoin } from '../zora/coinCreate';
 
 function ProjectForm({ addProject }) {
   const [name, setName] = useState('');
@@ -6,10 +7,16 @@ function ProjectForm({ addProject }) {
   const [repo, setRepo] = useState('');
   const [wallet, setWallet] = useState('');
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!name || !description || !repo || !wallet) return;
-    addProject({ name, description, repo, wallet });
+    // Generate a default symbol from the project name
+    const symbol = name.slice(0, 4).toUpperCase();
+    // Create the coin
+    alert(`Creating coin for project: ${name} (${symbol})`);
+    await createCoin({ name, symbol, signer: null }); // TODO: pass real signer
+    // Add the project
+    addProject({ name, description, repo, wallet, symbol });
     setName('');
     setDescription('');
     setRepo('');
