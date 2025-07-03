@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Link, NavLink } from 'react-router-dom';
 import { getDefaultConfig, RainbowKitProvider, ConnectButton } from '@rainbow-me/rainbowkit';
 import { WagmiProvider } from 'wagmi';
 import { base, baseSepolia } from 'wagmi/chains';
@@ -49,14 +49,14 @@ function App() {
             <div>
               <div className="app-header">Rootsy</div>
               <nav className="navbar">
-                <Link to="/">Home</Link>
-                <Link to="/projects">Projects</Link>
-                <Link to="/create">Create</Link>
-                <Link to="/trade">Trade</Link>
-                <Link to="/profile">Profile</Link>
+                <NavLink to="/" end className={({ isActive }) => isActive ? 'active' : ''}>Home</NavLink>
+                <NavLink to="/projects" className={({ isActive }) => isActive ? 'active' : ''}>Projects</NavLink>
+                <NavLink to="/create" className={({ isActive }) => isActive ? 'active' : ''}>Create</NavLink>
+                <NavLink to="/trade" className={({ isActive }) => isActive ? 'active' : ''}>Trade</NavLink>
+                <NavLink to="/profile" className={({ isActive }) => isActive ? 'active' : ''}>Profile</NavLink>
+                <span style={{ marginLeft: 'auto' }}><ConnectButton /></span>
               </nav>
-              <div style={{ maxWidth: 600, margin: '0 auto', padding: 24 }}>
-                <ConnectButton />
+              <div className="main-content">
                 <Routes>
                   <Route path="/" element={<Index />} />
                   <Route path="/projects" element={<Projects projects={projects} />} />
@@ -66,6 +66,9 @@ function App() {
                   <Route path="/project/:coinAddress" element={<ProjectDetail />} />
                 </Routes>
               </div>
+              <footer className="footer">
+                &copy; {new Date().getFullYear()} Rootsy &mdash; Funding Open Source with Zora Creator Coins
+              </footer>
             </div>
           </Router>
         </RainbowKitProvider>

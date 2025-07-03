@@ -66,31 +66,31 @@ function ProjectDetail() {
     if (coinAddress) fetchData();
   }, [coinAddress]);
 
-  if (loading) return <div style={{ maxWidth: 600, margin: '0 auto', padding: 24 }}>Loading...</div>;
-  if (error) return <div style={{ maxWidth: 600, margin: '0 auto', padding: 24, color: '#b91c1c' }}>{error}</div>;
+  if (loading) return <div>Loading...</div>;
+  if (error) return <div style={{ color: '#b91c1c' }}>{error}</div>;
   if (!project) return null;
 
   const zoraUrl = getZoraUrl(project.chain_id, project.coin_address);
 
   return (
-    <div style={{ maxWidth: 600, margin: '0 auto', padding: 24 }}>
-      <div className="card">
-        <h2>{project.name} <span style={{ color: '#6366f1', fontWeight: 400 }}>({project.symbol})</span></h2>
+    <>
+      <div className="card" style={{ animation: 'fadeInUp 0.7s cubic-bezier(.4,0,.2,1)' }}>
+        <h2 style={{ fontWeight: 800 }}>{project.name} <span style={{ color: '#6366f1', fontWeight: 400 }}>({project.symbol})</span></h2>
         <div style={{ marginBottom: 8 }}>{project.description}</div>
-        <a href={project.repo} target="_blank" rel="noopener noreferrer">Repository</a>
+        <a href={project.repo} target="_blank" rel="noopener noreferrer" style={{ color: '#7c3aed', fontWeight: 600 }}>Repository</a>
         <div style={{ fontSize: 13, color: '#666', marginTop: 8 }}>Payout: {project.payout_recipient}</div>
         <div style={{ fontSize: 13, color: '#666' }}>Chain: {CHAIN_NAMES[project.chain_id] || project.chain_id}</div>
         <div style={{ fontSize: 13, color: '#666' }}>Coin Address: {project.coin_address}</div>
         <div style={{ fontSize: 13, color: '#666' }}>Currency: {project.currency}</div>
         {zoraUrl && (
           <a href={zoraUrl} target="_blank" rel="noopener noreferrer">
-            <button style={{ marginTop: 16, width: '100%' }}>View on Zora Platform</button>
+            <button style={{ marginTop: 16, width: '100%', fontWeight: 700, fontSize: '1.1rem', letterSpacing: '0.01em' }}>View on Zora Platform</button>
           </a>
         )}
       </div>
       {coin && (
-        <div className="card">
-          <h3>Coin Details</h3>
+        <div className="card" style={{ animation: 'fadeInUp 0.7s cubic-bezier(.4,0,.2,1)' }}>
+          <h3 style={{ fontWeight: 700 }}>Coin Details</h3>
           <div><b>Name:</b> {coin.name}</div>
           <div><b>Symbol:</b> {coin.symbol}</div>
           <div><b>Description:</b> {coin.description}</div>
@@ -105,7 +105,7 @@ function ProjectDetail() {
           )}
         </div>
       )}
-    </div>
+    </>
   );
 }
 
