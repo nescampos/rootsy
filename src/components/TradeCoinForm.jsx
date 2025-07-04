@@ -13,14 +13,18 @@ function TradeCoinForm() {
   const [selectedCoin, setSelectedCoin] = useState('');
   const [direction, setDirection] = useState('eth-to-coin');
   const [amount, setAmount] = useState('');
-  const [slippage, setSlippage] = useState(0.05);
+  const [slippage, setSlippage] = useState(1);
   const [status, setStatus] = useState('');
   const [error, setError] = useState('');
 
+  // Base mainnet chain ID
+  const BASE_MAINNET_CHAIN_ID = 8453;
+  const isBaseMainnet = chainId === BASE_MAINNET_CHAIN_ID;
+
   useEffect(() => {
     const fetchCoins = async () => {
-      const { data, error } = await supabase.from('projects').select('coin_address, name, symbol');
-      if (!error && data) setCoins(data.filter(c => c.coin_address));
+      const { data, error } = await supabase.from('projects').select('coin_address, name, symbol, chain_id');
+      if (!error && data) setCoins(data.filter(c => c.coin_address && c.chain_id === BASE_MAINNET_CHAIN_ID));
     };
     fetchCoins();
   }, []);
@@ -42,7 +46,7 @@ function TradeCoinForm() {
           sell: { type: 'eth' },
           buy: { type: 'erc20', address: selectedCoin },
           amountIn: parseEther(amount),
-          slippage: Number(slippage),
+          slippage: Number(slippage) / 100,
           sender: address,
         };
       } else {
@@ -50,7 +54,7 @@ function TradeCoinForm() {
           sell: { type: 'erc20', address: selectedCoin },
           buy: { type: 'eth' },
           amountIn: parseEther(amount), // User must enter correct decimals
-          slippage: Number(slippage),
+          slippage: Number(slippage) / 100,
           sender: address,
         };
       }
@@ -98,8 +102,8 @@ function TradeCoinForm() {
       <div style={{ marginBottom: 12 }}>
         <label>Direction:</label>
         <select value={direction} onChange={e => setDirection(e.target.value)} style={{ width: '100%', marginBottom: 8 }}>
-          <option value="eth-to-coin">ETH → Coin</option>
-          <option value="coin-to-eth">Coin → ETH</option>
+          <option value="eth-to-coin">Buy</option>
+          <option value="coin-to-eth">Sell</option>
         </select>
       </div>
       <div style={{ marginBottom: 12 }}>
@@ -107,12 +111,17 @@ function TradeCoinForm() {
         <input type="number" min="0" step="any" value={amount} onChange={e => setAmount(e.target.value)} required style={{ width: '100%' }} />
       </div>
       <div style={{ marginBottom: 12 }}>
-        <label>Slippage:</label>
-        <input type="number" min="0" max="0.99" step="0.01" value={slippage} onChange={e => setSlippage(e.target.value)} required style={{ width: '100%' }} />
+        <label>Slippage (%):</label>
+        <input type="number" min="0" max="99" step="0.01" value={slippage} onChange={e => setSlippage(e.target.value)} required style={{ width: '100%' }} />
       </div>
       {status && <div style={{ color: '#059669', marginBottom: 8 }}>{status}</div>}
       {error && <div style={{ color: '#b91c1c', marginBottom: 8 }}>{error}</div>}
-      <button type="submit" disabled={!isConnected || !selectedCoin || !amount}>Trade</button>
+      {!isBaseMainnet && (
+        <div style={{ color: '#b91c1c', marginBottom: 8 }}>
+          Trading is only available on Base mainnet. Please switch your wallet network to Base.
+        </div>
+      )}
+      <button type="submit" disabled={!isConnected || !selectedCoin || !amount || !isBaseMainnet}>Trade</button>
     </form>
   );
 }
