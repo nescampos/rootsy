@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { useChainId } from 'wagmi';
 
 const CHAIN_NAMES = {
   8453: 'Base',
@@ -11,13 +10,9 @@ function Projects({ projects }) {
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(1);
   const pageSize = 30;
-  const chainId = useChainId();
-
-  // Only show projects for the connected chain
-  const chainFiltered = projects.filter(project => String(project.chain_id) === String(chainId));
 
   // Filter projects by search
-  const filtered = chainFiltered.filter(project =>
+  const filtered = projects.filter(project =>
     project.name.toLowerCase().includes(search.toLowerCase()) ||
     project.symbol.toLowerCase().includes(search.toLowerCase()) ||
     project.description.toLowerCase().includes(search.toLowerCase())
