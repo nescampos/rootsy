@@ -11,7 +11,7 @@ function ProjectForm({ addProject }) {
   const [name, setName] = useState('');
   const [symbol, setSymbol] = useState('');
   const [description, setDescription] = useState('');
-  const [repo, setRepo] = useState('');
+  const [githubUrl, setGithubUrl] = useState('');
   const [image, setImage] = useState(null);
   // const [imageUri, setImageUri] = useState('');
   const [uploading, setUploading] = useState(false);
@@ -52,40 +52,44 @@ function ProjectForm({ addProject }) {
     setImage(file);
   };
 
-  // Helper: Extract owner/repo from GitHub URL
-  function parseGitHubRepo(url) {
-    try {
-      const match = url.match(/github.com[/:]([^/]+)\/([^/]+)/i);
-      if (!match) return null;
-      return { owner: match[1], repo: match[2].replace(/\.git$/, '') };
-    } catch {
-      return null;
+  // Helper: Detect if URL is a PR or repo, and extract info
+  function parseGitHubUrl(url) {
+    // PR: github.com/{owner}/{repo}/pull/{number}
+    const prMatch = url.match(/github.com[/:]([^/]+)\/([^/]+)\/pull\/(\d+)/i);
+    if (prMatch) {
+      return { type: 'pr', owner: prMatch[1], repo: prMatch[2].replace(/\.git$/, ''), number: prMatch[3] };
     }
+    // Repo: github.com/{owner}/{repo}
+    const repoMatch = url.match(/github.com[/:]([^/]+)\/([^/]+)(?:$|[?#/])/i);
+    if (repoMatch) {
+      return { type: 'repo', owner: repoMatch[1], repo: repoMatch[2].replace(/\.git$/, '') };
+    }
+    return null;
   }
 
-  // Validate wallet address in README or PRs
-  async function validateGitHubOwnership(repoUrl, walletAddress) {
-    const repoInfo = parseGitHubRepo(repoUrl);
-    if (!repoInfo) return false;
-    const { owner, repo } = repoInfo;
-    // 1. Check README
-    try {
-      const readmeRes = await axios.get(`https://raw.githubusercontent.com/${owner}/${repo}/main/README.md`);
-      if (readmeRes?.data && readmeRes.data.toLowerCase().includes(walletAddress.toLowerCase())) {
-        return true;
-      }
-    } catch {}
-    // 2. Check open PRs
-    try {
-      const prsRes = await axios.get(`https://api.github.com/repos/${owner}/${repo}/pulls?state=open`);
-      if (Array.isArray(prsRes.data)) {
-        for (const pr of prsRes.data) {
-          if ((pr.body || '').toLowerCase().includes(walletAddress.toLowerCase())) {
-            return true;
-          }
+  // Validate wallet address in PR body or README
+  async function validateGitHubOwnership(githubUrl, walletAddress) {
+    const info = parseGitHubUrl(githubUrl);
+    if (!info) return false;
+    if (info.type === 'pr') {
+      // Check PR body
+      try {
+        const prRes = await axios.get(`https://api.github.com/repos/${info.owner}/${info.repo}/pulls/${info.number}`);
+        if ((prRes.data?.body || '').toLowerCase().includes(walletAddress.toLowerCase())) {
+          return true;
         }
-      }
-    } catch {}
+      } catch {}
+      return false;
+    } else if (info.type === 'repo') {
+      // Check README
+      try {
+        const readmeRes = await axios.get(`https://raw.githubusercontent.com/${info.owner}/${info.repo}/main/README.md`);
+        if (readmeRes?.data && readmeRes.data.toLowerCase().includes(walletAddress.toLowerCase())) {
+          return true;
+        }
+      } catch {}
+      return false;
+    }
     return false;
   }
 
@@ -93,16 +97,15 @@ function ProjectForm({ addProject }) {
     e.preventDefault();
     setValidationError('');
     setValidating(true);
-    // if (!name || !symbol || !description || !repo || !imageUri || !address || !chainId || !walletClient) return;
-    if (!name || !symbol || !description || !repo || !image || !address || !chainId || !walletClient) {
+    if (!name || !symbol || !description || !githubUrl || !image || !address || !chainId || !walletClient) {
       setValidating(false);
       return;
     }
-    // Validate GitHub ownership
-    const valid = await validateGitHubOwnership(repo, address);
+    // Validate GitHub ownership (README or PR)
+    const valid = await validateGitHubOwnership(githubUrl, address);
     setValidating(false);
     if (!valid) {
-      setValidationError('Your wallet address was not found in the repository README or any open pull request. Please add your address to the README or a PR description.');
+      setValidationError('Your wallet address was not found in the repository README or the pull request body. Please add your address to the README or PR description.');
       return;
     }
     let coinResult;
@@ -114,7 +117,7 @@ function ProjectForm({ addProject }) {
         chainId,
         description,
         image,
-        repo,
+        repo: githubUrl,
         currency: chainId === BASE_SEPOLIA_CHAIN_ID ? 'ETH' : currency,
         signer: walletClient
       });
@@ -132,7 +135,7 @@ function ProjectForm({ addProject }) {
         name,
         symbol,
         description,
-        repo,
+        repo: githubUrl,
         image_uri: image ? image.name : '', // Just store the file name or leave blank
         payout_recipient: address,
         chain_id: chainId,
@@ -144,13 +147,12 @@ function ProjectForm({ addProject }) {
       alert('Error saving project to Supabase: ' + error.message);
       return;
     }
-    addProject({ name, symbol, description, repo, image, payoutRecipient: address, chainId, coinAddress, currency: chainId === BASE_SEPOLIA_CHAIN_ID ? 'ETH' : currency });
+    addProject({ name, symbol, description, repo: githubUrl, image, payoutRecipient: address, chainId, coinAddress, currency: chainId === BASE_SEPOLIA_CHAIN_ID ? 'ETH' : currency });
     setName('');
     setSymbol('');
     setDescription('');
-    setRepo('');
+    setGithubUrl('');
     setImage(null);
-    // setImageUri('');
     setCurrency('ZORA');
   };
 
@@ -185,9 +187,9 @@ function ProjectForm({ addProject }) {
       />
       <input
         type="url"
-        placeholder="Repository Link"
-        value={repo}
-        onChange={e => setRepo(e.target.value)}
+        placeholder="GitHub Repository or Pull Request URL"
+        value={githubUrl}
+        onChange={e => setGithubUrl(e.target.value)}
         required
         style={{ width: '100%', marginBottom: 8 }}
       />
