@@ -1,5 +1,7 @@
 import React from 'react';
 
+// NOTE: This component is not used for the main project grid anymore. See Projects.jsx for the main list UI with search and pagination.
+
 function ProjectList({ projects }) {
   const fundProject = (wallet) => {
     alert(`Fund this project at wallet: ${wallet}`);
