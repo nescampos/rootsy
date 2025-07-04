@@ -74,9 +74,29 @@ function ProjectDetail() {
   return (
     <>
       <div className="card" style={{ animation: 'fadeInUp 0.7s cubic-bezier(.4,0,.2,1)' }}>
+        {(coin?.mediaContent?.previewImage?.medium || project.image_uri) && (
+          <img
+            src={coin?.mediaContent?.previewImage?.medium || project.image_uri}
+            alt={project.name}
+            style={{ width: 240, height: 240, objectFit: 'cover', borderRadius: 16, margin: '0 auto 18px auto', display: 'block', boxShadow: '0 2px 8px rgba(99,102,241,0.10)' }}
+          />
+        )}
         <h2 style={{ fontWeight: 800 }}>{project.name} <span style={{ color: '#6366f1', fontWeight: 400 }}>({project.symbol})</span></h2>
         <div style={{ marginBottom: 8 }}>{project.description}</div>
-        <a href={project.repo} target="_blank" rel="noopener noreferrer" style={{ color: '#7c3aed', fontWeight: 600 }}>Repository</a>
+        <a href={project.repo} target="_blank" rel="noopener noreferrer" style={{
+          display: 'inline-block',
+          background: 'linear-gradient(90deg, #6366f1 0%, #7c3aed 100%)',
+          color: 'white',
+          fontWeight: 700,
+          borderRadius: 8,
+          padding: '10px 24px',
+          margin: '12px 0',
+          textDecoration: 'none',
+          boxShadow: '0 2px 8px rgba(99,102,241,0.10)',
+          transition: 'background 0.2s, box-shadow 0.2s',
+          fontSize: '1.08rem',
+          letterSpacing: '0.01em'
+        }}>View Repository</a>
         <div style={{ fontSize: 13, color: '#666', marginTop: 8 }}>Payout: {project.payout_recipient}</div>
         <div style={{ fontSize: 13, color: '#666' }}>Chain: {CHAIN_NAMES[project.chain_id] || project.chain_id}</div>
         <div style={{ fontSize: 13, color: '#666' }}>Coin Address: {project.coin_address}</div>
@@ -98,11 +118,11 @@ function ProjectDetail() {
               </tr>
               <tr>
                 <td style={{ fontWeight: 600, padding: '6px 8px', color: '#6366f1' }}>Market Cap</td>
-                <td style={{ padding: '6px 8px', textAlign: 'right' }}>{coin.marketCap ? (Number(coin.marketCap) / 1e18).toLocaleString('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 2 }) : '-'}</td>
+                <td style={{ padding: '6px 8px', textAlign: 'right' }}>{coin.marketCap ? (Number(coin.marketCap) / 1e1).toLocaleString('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 2 }) : '-'}</td>
               </tr>
               <tr>
                 <td style={{ fontWeight: 600, padding: '6px 8px', color: '#6366f1' }}>24h Volume</td>
-                <td style={{ padding: '6px 8px', textAlign: 'right' }}>{coin.volume24h ? (Number(coin.volume24h) / 1e18).toLocaleString('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 2 }) : '-'}</td>
+                <td style={{ padding: '6px 8px', textAlign: 'right' }}>{coin.volume24h ? (Number(coin.volume24h) / 1e1).toLocaleString('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 2 }) : '-'}</td>
               </tr>
               <tr>
                 <td style={{ fontWeight: 600, padding: '6px 8px', color: '#6366f1' }}>Unique Holders</td>
@@ -118,9 +138,6 @@ function ProjectDetail() {
               </tr>
             </tbody>
           </table>
-          {coin.mediaContent?.previewImage && (
-            <img src={coin.mediaContent.previewImage.medium} alt={coin.symbol} style={{ width: 120, borderRadius: 8, marginTop: 12 }} />
-          )}
         </div>
       )}
     </>

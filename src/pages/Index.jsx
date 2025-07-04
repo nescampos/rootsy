@@ -27,6 +27,17 @@ function Index() {
           <li><b>Track your profile</b> and see your balances for all coins created on the platform.</li>
           <li><b>Explore detailed project and coin analytics</b> powered by Zora's onchain data.</li>
         </ul>
+        <div style={{ background: '#eef2ff', color: '#3730a3', borderRadius: 12, padding: '18px 18px 12px 18px', margin: '18px 0', fontSize: '1.08rem', boxShadow: '0 2px 8px rgba(99,102,241,0.08)' }}>
+          <h3 style={{ color: '#6366f1', marginBottom: 8, fontWeight: 700 }}>The Massive Impact of Open Source</h3>
+          <ul style={{ marginLeft: 20, marginBottom: 10 }}>
+            <li>According to <b>Harvard research</b>:</li>
+            <li style={{ marginTop: 6 }}><b>$4.15B</b> invested in open-source generates <b>$8.8T</b> of value for companies. That means <b>every $1 invested in open-source creates $2,000 of value</b>!</li>
+            <li style={{ marginTop: 6 }}>Without open source, companies would need to spend <b>3.5x more</b> on software than they currently do.</li>
+          </ul>
+          <div style={{ color: '#6366f1', fontWeight: 600, marginTop: 10 }}>
+            Open source is not just code—it's a global engine for innovation, efficiency, and economic growth.
+          </div>
+        </div>
         <h3 style={{ color: '#6366f1', marginBottom: 8 }}>Why fund open source?</h3>
         <p style={{ marginBottom: 12 }}>
           Open source software powers the internet, science, and innovation. By funding open source projects, you support the creators who build the tools and infrastructure we all rely on.

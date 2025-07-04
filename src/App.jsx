@@ -47,7 +47,6 @@ function App() {
         <RainbowKitProvider chains={config.chains}>
           <Router>
             <div>
-              <div className="app-header">Rootsy</div>
               <nav className="navbar">
                 <NavLink to="/" end className={({ isActive }) => isActive ? 'active' : ''}>Home</NavLink>
                 <NavLink to="/projects" className={({ isActive }) => isActive ? 'active' : ''}>Projects</NavLink>
