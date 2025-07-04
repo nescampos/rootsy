@@ -26,3 +26,8 @@ A minimal web app for open source developers to list their projects and receive 
 - ethers
 - wagmi
 - RainbowKit 
+
+
+# Team
+
+Created by [Nestor Campos](https://www.linkedin.com/in/nescampos/). Wallet Id: 0xda3ec0b8bddd2e8bdedede3333fbaf938fcc18c5
