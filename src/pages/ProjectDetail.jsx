@@ -90,15 +90,34 @@ function ProjectDetail() {
       {coin && (
         <div className="card" style={{ animation: 'fadeInUp 0.7s cubic-bezier(.4,0,.2,1)' }}>
           <h3 style={{ fontWeight: 700 }}>Coin Details</h3>
-          <div><b>Name:</b> {coin.name}</div>
-          <div><b>Symbol:</b> {coin.symbol}</div>
-          <div><b>Description:</b> {coin.description}</div>
-          <div><b>Total Supply:</b> {coin.totalSupply}</div>
-          <div><b>Market Cap:</b> {coin.marketCap}</div>
-          <div><b>24h Volume:</b> {coin.volume24h}</div>
-          <div><b>Creator:</b> {coin.creatorAddress}</div>
-          <div><b>Created At:</b> {coin.createdAt}</div>
-          <div><b>Unique Holders:</b> {coin.uniqueHolders}</div>
+          <table style={{ width: '100%', borderCollapse: 'collapse', marginTop: 12 }}>
+            <tbody>
+              <tr>
+                <td style={{ fontWeight: 600, padding: '6px 8px', color: '#6366f1' }}>Total Supply</td>
+                <td style={{ padding: '6px 8px', textAlign: 'right' }}>{Number(coin.totalSupply).toLocaleString()}</td>
+              </tr>
+              <tr>
+                <td style={{ fontWeight: 600, padding: '6px 8px', color: '#6366f1' }}>Market Cap</td>
+                <td style={{ padding: '6px 8px', textAlign: 'right' }}>{coin.marketCap ? (Number(coin.marketCap) / 1e18).toLocaleString('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 2 }) : '-'}</td>
+              </tr>
+              <tr>
+                <td style={{ fontWeight: 600, padding: '6px 8px', color: '#6366f1' }}>24h Volume</td>
+                <td style={{ padding: '6px 8px', textAlign: 'right' }}>{coin.volume24h ? (Number(coin.volume24h) / 1e18).toLocaleString('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 2 }) : '-'}</td>
+              </tr>
+              <tr>
+                <td style={{ fontWeight: 600, padding: '6px 8px', color: '#6366f1' }}>Unique Holders</td>
+                <td style={{ padding: '6px 8px', textAlign: 'right' }}>{coin.uniqueHolders ? Number(coin.uniqueHolders).toLocaleString() : '-'}</td>
+              </tr>
+              <tr>
+                <td style={{ fontWeight: 600, padding: '6px 8px', color: '#6366f1' }}>Creator</td>
+                <td style={{ padding: '6px 8px', textAlign: 'right', fontFamily: 'monospace' }}>{coin.creatorAddress}</td>
+              </tr>
+              <tr>
+                <td style={{ fontWeight: 600, padding: '6px 8px', color: '#6366f1' }}>Created At</td>
+                <td style={{ padding: '6px 8px', textAlign: 'right' }}>{coin.createdAt ? new Date(coin.createdAt).toLocaleString() : '-'}</td>
+              </tr>
+            </tbody>
+          </table>
           {coin.mediaContent?.previewImage && (
             <img src={coin.mediaContent.previewImage.medium} alt={coin.symbol} style={{ width: 120, borderRadius: 8, marginTop: 12 }} />
           )}

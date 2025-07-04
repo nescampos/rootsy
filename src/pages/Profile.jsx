@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useAccount } from 'wagmi';
 import { getProfile, getProfileBalances, setApiKey } from '@zoralabs/coins-sdk';
 import { supabase } from '../supabaseClient';
+import { Link } from 'react-router-dom';
 
 // Set Zora SDK API key from env
 setApiKey(import.meta.env.VITE_ZORA_API);
@@ -147,7 +148,7 @@ function Profile() {
           marginBottom: 32
         }}>
           {userProjects.map((project, idx) => (
-            <a key={project.id || idx} href={`/project/${project.coin_address}`} style={{ textDecoration: 'none' }}>
+            <Link key={project.id || idx} to={`/project/${project.coin_address}`} style={{ textDecoration: 'none' }}>
               <div className="card" style={{ cursor: 'pointer', transition: 'box-shadow 0.2s, transform 0.2s', minHeight: 220 }}>
                 <h3 style={{ fontWeight: 700, fontSize: '1.15rem', marginBottom: 6 }}>{project.name} <span style={{ color: '#6366f1', fontWeight: 400 }}>({project.symbol})</span></h3>
                 <p style={{ color: '#666', marginBottom: 8 }}>{project.description}</p>
@@ -155,7 +156,7 @@ function Profile() {
                 <p style={{ fontSize: 13, color: '#666', margin: '8px 0 0 0' }}>Payout: {project.payout_recipient}</p>
                 <p style={{ fontSize: 13, color: '#666' }}>Chain: {CHAIN_NAMES[project.chain_id] || project.chain_id}</p>
               </div>
-            </a>
+            </Link>
           ))}
         </div>
       )}

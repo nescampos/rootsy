@@ -3,7 +3,7 @@ import ProjectForm from '../components/ProjectForm';
 
 function CreateProject({ addProject }) {
   return (
-    <div style={{ maxWidth: 600, margin: '0 auto', padding: 24 }}>
+    <div style={{ maxWidth: '90%', margin: '0 auto', padding: 24 }}>
       <ProjectForm addProject={addProject} />
     </div>
   );
