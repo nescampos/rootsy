@@ -3,6 +3,7 @@ import { useAccount, useChainId, useWalletClient } from 'wagmi';
 import { createCoin } from '../zora/coinCreate';
 // import * as w3up from '@web3-storage/w3up-client';
 import { supabase } from '../supabaseClient';
+import axios from 'axios';
 
 const BASE_SEPOLIA_CHAIN_ID = 84532;
 
@@ -18,6 +19,8 @@ function ProjectForm({ addProject }) {
   const { address, isConnected } = useAccount();
   const chainId = useChainId();
   const { data: walletClient } = useWalletClient();
+  const [validationError, setValidationError] = useState('');
+  const [validating, setValidating] = useState(false);
 
   // Commented out IPFS upload logic
   // const handleImageChange = async (e) => {
@@ -49,10 +52,59 @@ function ProjectForm({ addProject }) {
     setImage(file);
   };
 
+  // Helper: Extract owner/repo from GitHub URL
+  function parseGitHubRepo(url) {
+    try {
+      const match = url.match(/github.com[/:]([^/]+)\/([^/]+)/i);
+      if (!match) return null;
+      return { owner: match[1], repo: match[2].replace(/\.git$/, '') };
+    } catch {
+      return null;
+    }
+  }
+
+  // Validate wallet address in README or PRs
+  async function validateGitHubOwnership(repoUrl, walletAddress) {
+    const repoInfo = parseGitHubRepo(repoUrl);
+    if (!repoInfo) return false;
+    const { owner, repo } = repoInfo;
+    // 1. Check README
+    try {
+      const readmeRes = await axios.get(`https://raw.githubusercontent.com/${owner}/${repo}/main/README.md`);
+      if (readmeRes?.data && readmeRes.data.toLowerCase().includes(walletAddress.toLowerCase())) {
+        return true;
+      }
+    } catch {}
+    // 2. Check open PRs
+    try {
+      const prsRes = await axios.get(`https://api.github.com/repos/${owner}/${repo}/pulls?state=open`);
+      if (Array.isArray(prsRes.data)) {
+        for (const pr of prsRes.data) {
+          if ((pr.body || '').toLowerCase().includes(walletAddress.toLowerCase())) {
+            return true;
+          }
+        }
+      }
+    } catch {}
+    return false;
+  }
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setValidationError('');
+    setValidating(true);
     // if (!name || !symbol || !description || !repo || !imageUri || !address || !chainId || !walletClient) return;
-    if (!name || !symbol || !description || !repo || !image || !address || !chainId || !walletClient) return;
+    if (!name || !symbol || !description || !repo || !image || !address || !chainId || !walletClient) {
+      setValidating(false);
+      return;
+    }
+    // Validate GitHub ownership
+    const valid = await validateGitHubOwnership(repo, address);
+    setValidating(false);
+    if (!valid) {
+      setValidationError('Your wallet address was not found in the repository README or any open pull request. Please add your address to the README or a PR description.');
+      return;
+    }
     let coinResult;
     try {
       coinResult = await createCoin({
@@ -159,9 +211,10 @@ function ProjectForm({ addProject }) {
         </select>
         {isBaseSepolia && <div style={{ color: '#6366f1', fontSize: 13 }}>Only ETH is supported on Base Sepolia.</div>}
       </div>
-      {/* {uploading && <div style={{ color: '#6366f1', marginBottom: 8 }}>Uploading image to IPFS...</div>} */}
-      {/* {imageUri && <div style={{ color: '#059669', marginBottom: 8 }}>Image uploaded: {imageUri}</div>} */}
-      <button type="submit" disabled={!isConnected || uploading || !image || !walletClient}>Add Project</button>
+      {validationError && <div style={{ color: '#b91c1c', marginBottom: 12 }}>{validationError}</div>}
+      <button type="submit" disabled={!isConnected || uploading || !image || !walletClient || validating}>
+        {validating ? 'Validating GitHub...' : 'Add Project'}
+      </button>
     </form>
   );
 }

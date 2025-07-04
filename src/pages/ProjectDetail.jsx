@@ -83,7 +83,7 @@ function ProjectDetail() {
         <div style={{ fontSize: 13, color: '#666' }}>Currency: {project.currency}</div>
         {zoraUrl && (
           <a href={zoraUrl} target="_blank" rel="noopener noreferrer">
-            <button style={{ marginTop: 16, width: '100%', fontWeight: 700, fontSize: '1.1rem', letterSpacing: '0.01em' }}>View on Zora Platform</button>
+            <button style={{ marginTop: 16, width: '100%', fontWeight: 700, fontSize: '1.1rem', letterSpacing: '0.01em' }}>View/Trade on Zora Platform</button>
           </a>
         )}
       </div>
