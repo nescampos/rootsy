@@ -41,6 +41,7 @@ export async function createCoin({ name, symbol, payoutRecipient, chainId, descr
     if (image) {
       metadataBuilder.withImage(image);
     }
+    
     const { createMetadataParameters } = await metadataBuilder.upload(
       createZoraUploaderForCreator(payoutRecipient)
     );
@@ -57,6 +58,7 @@ export async function createCoin({ name, symbol, payoutRecipient, chainId, descr
     const coinParams = {
       ...createMetadataParameters,
       payoutRecipient,
+      platformReferrer: import.meta.env.VITE_ZORA_REFERRAL_CODE,
       chainId,
       currency: currency === 'ETH' ? DeployCurrency.ETH : DeployCurrency.ZORA,
     };
