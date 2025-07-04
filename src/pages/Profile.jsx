@@ -6,6 +6,11 @@ import { supabase } from '../supabaseClient';
 // Set Zora SDK API key from env
 setApiKey(import.meta.env.VITE_ZORA_API);
 
+const CHAIN_NAMES = {
+  8453: 'Base',
+  84532: 'Base Sepolia',
+};
+
 function Profile() {
   const { address, isConnected } = useAccount();
   const [identifier, setIdentifier] = useState('');
@@ -148,7 +153,7 @@ function Profile() {
                 <p style={{ color: '#666', marginBottom: 8 }}>{project.description}</p>
                 <a href={project.repo} target="_blank" rel="noopener noreferrer" style={{ color: '#7c3aed', fontWeight: 600 }}>Repo</a>
                 <p style={{ fontSize: 13, color: '#666', margin: '8px 0 0 0' }}>Payout: {project.payout_recipient}</p>
-                <p style={{ fontSize: 13, color: '#666' }}>Chain: {project.chain_id}</p>
+                <p style={{ fontSize: 13, color: '#666' }}>Chain: {CHAIN_NAMES[project.chain_id] || project.chain_id}</p>
               </div>
             </a>
           ))}

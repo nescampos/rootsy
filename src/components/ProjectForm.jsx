@@ -4,6 +4,7 @@ import { createCoin } from '../zora/coinCreate';
 // import * as w3up from '@web3-storage/w3up-client';
 import { supabase } from '../supabaseClient';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
 const BASE_SEPOLIA_CHAIN_ID = 84532;
 
@@ -21,6 +22,7 @@ function ProjectForm({ addProject }) {
   const { data: walletClient } = useWalletClient();
   const [validationError, setValidationError] = useState('');
   const [validating, setValidating] = useState(false);
+  const navigate = useNavigate();
 
   // Commented out IPFS upload logic
   // const handleImageChange = async (e) => {
@@ -154,6 +156,7 @@ function ProjectForm({ addProject }) {
     setGithubUrl('');
     setImage(null);
     setCurrency('ZORA');
+    navigate(`/project/${coinAddress}`);
   };
 
   const isBaseSepolia = chainId === BASE_SEPOLIA_CHAIN_ID;

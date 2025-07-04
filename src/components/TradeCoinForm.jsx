@@ -100,7 +100,7 @@ function TradeCoinForm() {
         </select>
       </div>
       <div style={{ marginBottom: 12 }}>
-        <label>Direction:</label>
+        <label>Option:</label>
         <select value={direction} onChange={e => setDirection(e.target.value)} style={{ width: '100%', marginBottom: 8 }}>
           <option value="eth-to-coin">Buy</option>
           <option value="coin-to-eth">Sell</option>
