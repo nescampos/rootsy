@@ -18,7 +18,7 @@ function TradeCoinForm() {
   const [error, setError] = useState('');
 
   // Base mainnet chain ID
-  const BASE_MAINNET_CHAIN_ID = 8453;
+  const BASE_MAINNET_CHAIN_ID = "8453";
   const isBaseMainnet = chainId === BASE_MAINNET_CHAIN_ID;
 
   useEffect(() => {
